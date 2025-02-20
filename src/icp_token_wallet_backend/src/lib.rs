@@ -11,12 +11,17 @@ pub struct Wallet {
 }
 
 impl Wallet {
+    ///Create a new wallet instance
     pub fn new() -> Self {
         Wallet {
             balances: HashMap::new(),
         }
     }
 
+    /// Sends tokens from the wallet's balance to another address
+    /// - `to_address`: The address to send tokens to
+    /// - `amount`: The number of tokens to send
+    /// - Returns `Ok(())` if successful, or an `Err` with an error message if insufficient funds
     pub fn send_tokens(&mut self, to_address: String, amount: u64) -> Result<(), String> {
         let sender_balance = self.balances.entry("self".to_string()).or_insert(0);
         if *sender_balance < amount {
@@ -30,6 +35,9 @@ impl Wallet {
         Ok(())
     }
 
+    /// Receives tokens into the wallet
+    /// - `from_address`: The address from which tokens are received
+    /// - `amount`: The number of tokens received
     pub fn receive_tokens(&mut self, from_address: String, amount: u64) {
         let recipient_balance = self.balances.entry("self".to_string()).or_insert(0);
         *recipient_balance += amount;
@@ -37,6 +45,8 @@ impl Wallet {
         ic_cdk::println!("Received {} tokens from {}", amount, from_address);
     }
 
+    /// Fetches the current balance of the wallet
+    /// - Returns the balance as `u64`
     pub fn get_balance(&self) -> u64 {
         *self.balances.get("self").unwrap_or(&0)
     }
@@ -45,24 +55,33 @@ impl Wallet {
 // Thread-safe global Wallet instance
 static WALLET: Lazy<Mutex<Wallet>> = Lazy::new(|| Mutex::new(Wallet::new()));
 
+/// Query function to get the wallet's balance
 #[query]
 fn get_balance() -> u64 {
     let wallet = WALLET.lock().expect("Failed to acquire wallet lock");
     wallet.get_balance()
 }
 
+/// Update function to send tokens
+/// - `to_address`: The recipient's address
+/// - `amount`: The number of tokens to send
+/// - Returns `Ok(())` if successful, or an `Err` if an error occurs
 #[update]
 fn send_tokens(to_address: String, amount: u64) -> Result<(), String> {
     let mut wallet = WALLET.lock().expect("Failed to acquire wallet lock");
     wallet.send_tokens(to_address, amount)
 }
 
+/// Update function to receive tokens
+/// - `from_address`: The sender's address
+/// - `amount`: The number of tokens received
 #[update]
 fn receive_tokens(from_address: String, amount: u64) {
     let mut wallet = WALLET.lock().expect("Failed to acquire wallet lock");
     wallet.receive_tokens(from_address, amount);
 }
 
+/// Unit tests for the Wallet implementation
 #[cfg(test)]
 mod tests {
     use super::*;

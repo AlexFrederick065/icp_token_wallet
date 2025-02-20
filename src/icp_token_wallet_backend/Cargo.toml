@@ -9,14 +9,14 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] } # For serialization/deserialization
-candid = "0.8.3"                                   # For Candid serialization/deserialization
-ic-cdk = "0.17.1"                                  # Latest compatible version with dfx 0.25.0
-ic-cdk-macros = "0.17.1"                           # Macros for Internet Computer functions
-once_cell = "1.17.1"
-
+serde = { version = "1.0", features = ["derive"] } # Provides support for serializing and deserializing data structures in Rust
+candid = "0.8.3"                                   # Enables serialization and deserialization of data in Candid format, used in Internet Computer
+ic-cdk = "0.17.1"                                  # Provides core functions and tools for developing canisters on the Internet Computer
+ic-cdk-macros = "0.17.1"                           # Contains macros for defining query and update functions in IC canisters
+once_cell = "1.17.1"                               # Enables creating thread-safe global static variables
 
 [dev-dependencies]
-ic-cdk = "0.17.1"  
+ic-cdk = "0.17.1"                                  # Included for testing purposes to provide necessary CDK utilities during development
+
 
 
